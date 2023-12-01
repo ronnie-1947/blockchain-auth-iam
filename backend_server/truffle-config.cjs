@@ -2,7 +2,7 @@ const dotenv = require('dotenv')
 dotenv.config()
 
 const GANACHE_PORT = process.env.GANACHE_PORT
-const GANACHE_IP = process.env.GANACHE_IP
+const GANACHE_HOST = process.env.GANACHE_HOST
 
 /**
  * Use this file to configure your truffle project. It's seeded with some
@@ -71,7 +71,7 @@ module.exports = {
     // options below to some value.
     //
     development: {
-     host: GANACHE_IP || '127.0.0.1',     // Localhost (default: none)
+     host: GANACHE_HOST || '127.0.0.1',     // Localhost (default: none)
      port: GANACHE_PORT || 7545,            // Standard Ethereum port (default: none)
      network_id: "*", // Any network (default: none)
     },

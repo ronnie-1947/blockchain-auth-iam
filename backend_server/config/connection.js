@@ -1,9 +1,10 @@
 import { Web3 } from 'web3'
 import truffleConfig from './config.truffle.js'
+import dotenv from 'dotenv'
 
-const { MODE, GANACHE_IP, GANACHE_PORT, GANACHE_NETWORK } = process.env
-
-const tConfig = truffleConfig(GANACHE_IP, GANACHE_PORT, GANACHE_NETWORK)
+dotenv.config()
+const { MODE, GANACHE_HOST, GANACHE_PORT, GANACHE_NETWORKID} = process.env
+const tConfig = truffleConfig(GANACHE_HOST, GANACHE_PORT, GANACHE_NETWORKID)
 
 const web3_pool = function () {
   const nw = tConfig.networks[MODE || 'development'];
