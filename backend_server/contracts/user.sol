@@ -31,10 +31,20 @@ contract User {
   }
 
   // Function to get user data
-  function getUserData(
+  function getUserPublicKey(
     address _userAddress
-  ) external view returns (string memory name, string memory email, string memory publicKey) {
-    return (users[_userAddress].name, users[_userAddress].email, users[_userAddress].publicKey);
+  ) external view returns (string memory) {
+    return users[_userAddress].publicKey;
+  }
+  function getUserName(
+    address _userAddress
+  ) external view returns (string memory) {
+    return users[_userAddress].name;
+  }
+  function getUserEmail(
+    address _userAddress
+  ) external view returns (string memory) {
+    return users[_userAddress].email;
   }
 
   // Function to update user data (name and email)
