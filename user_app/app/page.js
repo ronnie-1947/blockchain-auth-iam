@@ -1,95 +1,108 @@
-import Image from 'next/image'
-import styles from './page.module.css'
+'use client'
 
-export default function Home() {
+import { useRouter } from 'next/navigation'
+import React, { useEffect, useState } from 'react'
+import styles from './Page.module.scss';
+import { encryptData } from '@/utils/encrypt';
+
+const page = () => {
+
+  const router = useRouter()
+
+  const [userData, setUserData] = useState({
+    name: 'John Doe',
+    email: 'john.doe@example.com',
+    address: '',
+    walletKey: ''
+  });
+
+  useEffect(() => {
+
+    const tokenStr = window.localStorage.getItem('token')
+    if (!tokenStr) router.push('/login')
+
+    const token = JSON.parse(tokenStr)
+    setUserData({
+      name: token?.name,
+      email: token?.email,
+      address: token?.address,
+      walletKey: token?.walletKey
+    })
+  }, [])
+
+  const [formData, setFormData] = useState({
+    key: '',
+    value: ''
+  });
+
+  const handleChange = (e) => {
+    const { name, value } = e.target;
+    setFormData((prevData) => ({ ...prevData, [name]: value }));
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+    // Add your form submission logic here
+    const { key, value } = formData
+
+    if (key.length < 1 || value.length < 1) return
+
+    // Encrypt with private key
+    const encrypted = await encryptData(value, userData.walletKey.replace('0x', ''))
+
+    // Submit data
+    const store = await fetch('http://localhost:3735/private/storeData', {
+      method: 'POST',
+      headers: {
+        "Content-Type": "application/json",
+        "authorization": `Bearer ${userData.address}`
+      },
+      body: JSON.stringify({
+        [key]: encrypted,
+      })
+    })
+
+    const jsonResponse = await store.json()
+
+    console.log(jsonResponse)
+  };
+
   return (
-    <main className={styles.main}>
-      <div className={styles.description}>
+    <div className={styles.pageContainer}>
+      <div className={styles.topSection}>
+        <h1>Welcome to Next.js App</h1>
         <p>
-          Get started by editing&nbsp;
-          <code className={styles.code}>app/page.js</code>
+          <strong>Name:</strong> {userData.name} | <strong>Email:</strong> {userData.email} |{' '}
+          <strong>Address:</strong> {userData.address}
         </p>
-        <div>
-          <a
-            href="https://vercel.com?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            By{' '}
-            <Image
-              src="/vercel.svg"
-              alt="Vercel Logo"
-              className={styles.vercelLogo}
-              width={100}
-              height={24}
-              priority
+      </div>
+
+      <div className={styles.bottomSection}>
+        <h2>Add Sensitive Data</h2>
+        <form onSubmit={handleSubmit}>
+          <label>
+            Data Name:
+            <input
+              type="text"
+              name="key"
+              value={formData.key}
+              onChange={handleChange}
             />
-          </a>
-        </div>
+          </label>
+          <label>
+            Sensitive Data Value:
+            <input
+              type="text"
+              name="value"
+              value={formData.value}
+              onChange={handleChange}
+            />
+          </label>
+          <button type="submit">Submit</button>
+        </form>
       </div>
-
-      <div className={styles.center}>
-        <Image
-          className={styles.logo}
-          src="/next.svg"
-          alt="Next.js Logo"
-          width={180}
-          height={37}
-          priority
-        />
-      </div>
-
-      <div className={styles.grid}>
-        <a
-          href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Docs <span>-&gt;</span>
-          </h2>
-          <p>Find in-depth information about Next.js features and API.</p>
-        </a>
-
-        <a
-          href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Learn <span>-&gt;</span>
-          </h2>
-          <p>Learn about Next.js in an interactive course with&nbsp;quizzes!</p>
-        </a>
-
-        <a
-          href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Templates <span>-&gt;</span>
-          </h2>
-          <p>Explore starter templates for Next.js.</p>
-        </a>
-
-        <a
-          href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template&utm_campaign=create-next-app"
-          className={styles.card}
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          <h2>
-            Deploy <span>-&gt;</span>
-          </h2>
-          <p>
-            Instantly deploy your Next.js site to a shareable URL with Vercel.
-          </p>
-        </a>
-      </div>
-    </main>
-  )
+    </div>
+  );
 }
+
+export default page

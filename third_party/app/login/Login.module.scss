@@ -1,0 +1,28 @@
+/* styles/LoginPage.module.css */
+
+.logincontainer {
+  text-align: center;
+  width: 300px;
+}
+
+.loginheading {
+  font-size: 2rem;
+  margin-bottom: 20px;
+}
+
+.addressinput {
+  width: 100%;
+  padding: 10px;
+  margin-bottom: 15px;
+  box-sizing: border-box;
+}
+
+.loginbutton {
+  width: 100%;
+  padding: 10px;
+  background-color: #4caf50;
+  color: white;
+  border: none;
+  border-radius: 5px;
+  cursor: pointer;
+}

@@ -1,0 +1,42 @@
+/* LoginPage.css */
+
+.login-page {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  margin: 20px;
+}
+
+h1 {
+  color: #333;
+}
+
+.account-list {
+  margin-top: 20px;
+}
+
+ul {
+  list-style-type: none;
+  padding: 0;
+}
+
+li {
+  cursor: pointer;
+  margin-bottom: 10px;
+  border: 1px solid #ddd;
+  padding: 10px;
+  border-radius: 5px;
+}
+
+li strong {
+  color: #007bff;
+}
+
+/* Style for clickable button effect */
+.account-button {
+  transition: background-color 0.3s;
+}
+
+.account-button:hover {
+  background-color: #f0f0f0;
+}

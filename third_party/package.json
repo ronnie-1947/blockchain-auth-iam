@@ -1,5 +1,5 @@
 {
-  "name": "user_app",
+  "name": "third_party",
   "version": "0.1.0",
   "private": true,
   "scripts": {
@@ -11,7 +11,9 @@
   "dependencies": {
     "next": "14.0.3",
     "react": "^18",
-    "react-dom": "^18",
+    "react-dom": "^18"
+  },
+  "devDependencies": {
     "sass": "^1.69.5"
   }
 }

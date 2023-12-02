@@ -7,5 +7,6 @@ router.get('/', authServices.welcome)
 router.post('/signup', authServices.signup)
 router.post('/login', authServices.login)
 router.post('/oAuth', authServices.oAuth)
+router.post('/verify', authServices.verify)
 
 export default router

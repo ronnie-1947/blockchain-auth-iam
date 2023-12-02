@@ -24,13 +24,28 @@ export const makeKeyPair = (address) => {
   }
 
   // Save in disk
-  let arr = []
+  // let arr = []
+  // const jsonKeysExist = fs.existsSync(keysPath)
+  // if (jsonKeysExist) {
+  //   const jsonKeys = JSON.parse(fs.readFileSync(keysPath, 'utf-8'))
+  //   arr = [...jsonKeys]
+  // }
+  // arr.push({ [address.replace('0x', '')]: key })
+
+  // fs.writeFileSync(keysPath, JSON.stringify(arr))
+
+
+  let arr = {}
   const jsonKeysExist = fs.existsSync(keysPath)
   if (jsonKeysExist) {
-    const jsonKeys = JSON.parse(fs.readFileSync(keysPath, 'utf-8'))
-    arr = [...jsonKeys]
+    let jsonKeys = fs.readFileSync(keysPath, 'utf-8')
+    if(jsonKeys.length > 0){
+      jsonKeys = JSON.parse(jsonKeys)
+      arr = jsonKeys
+    }
   }
-  arr.push({ [address.replace('0x', '')]: key })
+  const prevData = arr[address.replace('0x','')] 
+  arr[address.replace('0x','')] = {...prevData, ...key}
 
   fs.writeFileSync(keysPath, JSON.stringify(arr))
 

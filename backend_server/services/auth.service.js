@@ -2,6 +2,7 @@ import express from 'express'
 import cookie from 'cookie'
 import { addUser, getUser } from '../utils/contractCalls.utils.js'
 import {makeKeyPair} from '../utils/crypto.utils.js'
+import { readKeys } from '../utils/readWrite.js'
 
 
 export const welcome = async (_, res = express.response, next) => {
@@ -39,6 +40,7 @@ export const login = async (req = express.request, res = express.response, next)
     const { address } = req.body
     
     const user = await getUser(address)
+    const keys = await readKeys(address)
     if (!user) {
       res.status(501).json({
         error: true,
@@ -51,8 +53,8 @@ export const login = async (req = express.request, res = express.response, next)
       expires: new Date(Date.now() + 7 * 24 * 60 * 60 * 1000),
       httpOnly: true
     })
-
-    res.setHeader('Set-Cookie', setCookie).json(user)
+    
+    res.setHeader('Set-Cookie', setCookie).json({...user, ...keys})
 
   } catch (error) {
     console.error(error)
@@ -63,6 +65,22 @@ export const login = async (req = express.request, res = express.response, next)
 export const oAuth = async (_, res = express.response, next) => {
   try {
 
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const verify = async (req, res=express.response, next)=>{
+  try {
+
+    const encryptedCode = req.body.encryptedHex
+    
+    // Send the code to client and decrypt it
+    const sendMsg = await sendCustomMessageToClient('client_react', {command: 'decrypt', encryptedCode})
+    console.log(sendMsg)
+    // Send the response back
+    res.json('Wait for verification')
+    
   } catch (error) {
     next(error)
   }
