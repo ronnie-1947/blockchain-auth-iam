@@ -16,7 +16,7 @@ export const makeKeyPair = (address) => {
   })
 
   // Get private key with address
-  const walletKey = private_keys?.['96b18d6f9233c1f2888e698b0d8512df4519f5b2']
+  const walletKey = private_keys?.[address?.toLowerCase()]
   
   const key = {
     walletKey,
@@ -24,18 +24,8 @@ export const makeKeyPair = (address) => {
   }
 
   // Save in disk
-  // let arr = []
-  // const jsonKeysExist = fs.existsSync(keysPath)
-  // if (jsonKeysExist) {
-  //   const jsonKeys = JSON.parse(fs.readFileSync(keysPath, 'utf-8'))
-  //   arr = [...jsonKeys]
-  // }
-  // arr.push({ [address.replace('0x', '')]: key })
-
-  // fs.writeFileSync(keysPath, JSON.stringify(arr))
-
-
   let arr = {}
+
   const jsonKeysExist = fs.existsSync(keysPath)
   if (jsonKeysExist) {
     let jsonKeys = fs.readFileSync(keysPath, 'utf-8')

@@ -1,3 +1,5 @@
+'use client'
+
 import { decryptWithPrivateKey } from '@/utils/encrypt';
 import { useEffect } from 'react'
 
@@ -22,7 +24,7 @@ const useAuth = () => {
 
           const { encryptedCode } = payload
           // Decrypt the code with private key
-          
+
           const tokenStr = window.localStorage.getItem('token')
           if (!tokenStr) throw new Error('You are not logged in')
           const token = JSON.parse(tokenStr)
@@ -34,6 +36,7 @@ const useAuth = () => {
     };
 
     return () => {
+      "Closing conn"
       socket.close()
     }
 

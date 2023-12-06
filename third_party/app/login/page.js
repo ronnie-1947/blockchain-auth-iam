@@ -3,13 +3,17 @@
 import React, { useState } from 'react'
 import styles from './Login.module.scss';
 import { encrypt } from '@/utils/crypto';
+import { useContext } from '@/hooks/useAuthContext';
+import { useRouter } from 'next/navigation';
 
 const Login = () => {
 
 
   const [address, setAddress] = useState('')
-  const loginWithWeb3 = async (e) => {
+  const { state, dispatch } = useContext()
+  const router = useRouter()
 
+  const loginWithWeb3 = async (e) => {
     try {
 
       e.preventDefault()
@@ -22,12 +26,12 @@ const Login = () => {
         socket.send(JSON.stringify({ payload: { address }, status: 'fetchPub' }))
       }
 
-      
+
       let otp = ''
       socket.onmessage = async (event) => {
         const receivedMessage = JSON.parse(event.data);
         console.log(receivedMessage)
-        
+
         const { status, payload } = receivedMessage
 
         switch (status) {
@@ -45,12 +49,14 @@ const Login = () => {
             // Encrypt with the public key
             const encryptedHex = await encrypt(pubKey, otp)
 
-            socket.send(JSON.stringify({ status: 'sentEncryptedCode', payload:encryptedHex }))
+            socket.send(JSON.stringify({ status: 'sentEncryptedCode', payload: encryptedHex }))
             break
 
           case 'decryptedCode':
-            if(payload === otp){
-              console.log('LOGGED IN')
+            if (payload === otp) {
+              dispatch({ type: 'login', payload: address })
+              window.localStorage.setItem('token', address)
+              socket.close()
             }
             break
 
@@ -69,15 +75,27 @@ const Login = () => {
 
   return (
     <body className={styles.body}>
-      <div className={styles.logincontainer}>
-        <h1 className={styles.loginheading}>LOGIN</h1>
-        <form onSubmit={loginWithWeb3}>
-          <input type="text" className={styles.addressinput} value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your address" id="addressInput" />
-          <button className={styles.loginbutton} onClick={loginWithWeb3}>Login with Web3</button>
-        </form>
-
-        {/* Your Web3 login logic goes here */}
-      </div>
+      {
+        !state?.user ? (
+          <>
+            <div className={styles.logincontainer}>
+              <h1 className={styles.loginheading}>LOGIN</h1>
+              <form onSubmit={loginWithWeb3}>
+                <input type="text" className={styles.addressinput} value={address} onChange={(e) => setAddress(e.target.value)} placeholder="Enter your address" id="addressInput" />
+                <button className={styles.loginbutton} onClick={loginWithWeb3}>Login with Web3</button>
+              </form>
+            </div>
+          </>
+        ) : (
+          <>
+            <div className={styles.logincontainerfull}>
+              <h1 className={styles.loginheading}>LOGGED IN</h1>
+              <h2 className={styles.loginaddress}>{state.user}</h2>
+              <button className={styles.loginbutton} onClick={()=>router.push('/')}>Go to Home</button>
+            </div>
+          </>
+        )
+      }
 
     </body>
   );

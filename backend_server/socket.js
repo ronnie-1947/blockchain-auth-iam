@@ -1,5 +1,6 @@
 import { accInfoSoc } from "./services/eth.service.js";
 import WebSocket from 'ws'
+import { readConsents, readData } from "./utils/readWrite.js";
 
 const clients = new Map();
 
@@ -52,6 +53,26 @@ export default function (ws, req) {
           sendCustomMessageToClient(clients.get(thirdPartyId), JSON.stringify({
             status: 'decryptedCode',
             payload
+          }))
+          break
+
+        case 'reqData':
+          console.log(payload)
+          const {domain, data, purpose, address: addr} = payload
+
+          // check existing data
+          const encryptedData = readData(data, addr)
+          if(!encryptedData) sendCustomMessageToClient(clients.get(thirdPartyId), JSON.stringify({
+            status: 'dataReqFailed',
+            payload: 'Data not stored in chain'
+          }))
+
+          // check permisson
+          const consent = readConsents(addr,domain, data)
+
+          // Send the payload to user client
+          sendCustomMessageToClient(clients.get(userClientId), JSON.stringify({
+            consent, encryptedData, purpose
           }))
           break
 

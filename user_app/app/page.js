@@ -4,31 +4,14 @@ import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import styles from './Page.module.scss';
 import { encryptData } from '@/utils/encrypt';
+import { useContext } from '@/hooks/useAuthContext';
+
 
 const page = () => {
 
-  const router = useRouter()
-
-  const [userData, setUserData] = useState({
-    name: 'John Doe',
-    email: 'john.doe@example.com',
-    address: '',
-    walletKey: ''
-  });
-
-  useEffect(() => {
-
-    const tokenStr = window.localStorage.getItem('token')
-    if (!tokenStr) router.push('/login')
-
-    const token = JSON.parse(tokenStr)
-    setUserData({
-      name: token?.name,
-      email: token?.email,
-      address: token?.address,
-      walletKey: token?.walletKey
-    })
-  }, [])
+  const {state} = useContext()
+  const userData = state.user
+  console.log(userData)
 
   const [formData, setFormData] = useState({
     key: '',
@@ -48,14 +31,14 @@ const page = () => {
     if (key.length < 1 || value.length < 1) return
 
     // Encrypt with private key
-    const encrypted = await encryptData(value, userData.walletKey.replace('0x', ''))
+    const encrypted = await encryptData(value, userData?.walletKey.replace('0x', ''))
 
     // Submit data
     const store = await fetch('http://localhost:3735/private/storeData', {
       method: 'POST',
       headers: {
         "Content-Type": "application/json",
-        "authorization": `Bearer ${userData.address}`
+        "authorization": `Bearer ${userData?.address}`
       },
       body: JSON.stringify({
         [key]: encrypted,
@@ -72,8 +55,8 @@ const page = () => {
       <div className={styles.topSection}>
         <h1>Welcome to Next.js App</h1>
         <p>
-          <strong>Name:</strong> {userData.name} | <strong>Email:</strong> {userData.email} |{' '}
-          <strong>Address:</strong> {userData.address}
+          <strong>Name:</strong> {userData?.name} | <strong>Email:</strong> {userData?.email} |{' '}
+          <strong>Address:</strong> {userData?.address}
         </p>
       </div>
 

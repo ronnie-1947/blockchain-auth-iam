@@ -40,6 +40,7 @@ const LoginPage = () => {
       window.localStorage.setItem('token', JSON.stringify(jsonResponse))
       router.push('/')
     } catch (error) {
+      console.log(error)
       router.push(`/signup?acc=${account}`)
     }
 

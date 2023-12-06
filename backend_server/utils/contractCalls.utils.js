@@ -20,10 +20,11 @@ export const addUser = async (address, name, email, publicKey) => {
   const contract = await newContract(eth)
   eth.defaultAccount = address
   const transaction = await contract.methods.addUser(name, email, publicKey)
+  const randomGas = Math.floor(Math.random() * (5000000 - 2000000 + 1)) + 2000000;
 
   const receipt = await transaction.send({
     from: eth.defaultAccount,
-    gas: 2000000,
+    gas: randomGas,
   });
 
   return receipt

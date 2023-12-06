@@ -22,10 +22,11 @@ export const signup = async (req= express.request, res = express.response, next)
 
     // Make public private key pair
     const {publicKey} = await makeKeyPair(address)
-
+    
     // Save user in blockchain
     const receipt = await addUser(address, name, email, publicKey)
     console.log(receipt.events.UserAdded.returnValues)
+
     // return user in json format
     res.json({address, name, email})
 
@@ -42,7 +43,7 @@ export const login = async (req = express.request, res = express.response, next)
     const user = await getUser(address)
     const keys = await readKeys(address)
     if (!user) {
-      res.status(501).json({
+      res.status(200).json({
         error: true,
         error_code: '4001',
         msg: 'No user found'
