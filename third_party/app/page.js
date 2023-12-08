@@ -2,6 +2,7 @@
 import { useState } from 'react';
 import styles from './page.module.scss'
 import { useContext } from '@/hooks/useAuthContext';
+import { useRouter } from 'next/navigation';
 
 // App.js
 
@@ -10,12 +11,14 @@ const App = () => {
 
 
   const { state } = useContext()
+  const router = useRouter()
 
   const [formData, setFormData] = useState({
     data: '',
     purpose: '',
     expiry: '',
   });
+  const [retrivedData, setRetrivedData] = useState(null)
 
   const handleInputChange = (e) => {
     setFormData({
@@ -34,7 +37,7 @@ const App = () => {
 
     socket.onopen = () => {
       socket.send(JSON.stringify({ payload: { whoami: 'other_react' }, status: 'initialized' }))
-      socket.send(JSON.stringify({ payload: { ...formData, domain: 'walmart', address: state?.user }, status: 'reqData' }))
+      socket.send(JSON.stringify({ payload: { ...formData, domain: 'UOGuelph', address: state?.user }, status: 'reqData' }))
     }
 
     socket.onmessage = async(e)=>{
@@ -44,15 +47,29 @@ const App = () => {
       const {status, payload} = receivedMessage
 
       // status === 'dataReqFailed'
+      switch (status) {
+        case 'dataRetrived':
+          setRetrivedData(JSON.stringify(payload))
+          break;
+      
+        default:
+          break;
+      }
+
     }
   };
+
+  const logoutHandler = ()=>{
+    window.localStorage.clear()
+    router.push('/login')
+  }
 
   return (
     <main className={styles.main}>
       {/* Navbar */}
       <nav className={styles.nav}>
         <p>User : {state.user}</p>
-        <button>Button</button>
+        <button onClick={logoutHandler}>Logout</button>
       </nav>
 
       {/* Page Content */}
@@ -62,7 +79,7 @@ const App = () => {
 
         {/* Paragraph with Information */}
         <p>
-          Assume this is WALMART.com. Walmart wants SIN number of one of its employee. Walmart can send a Request the employee's wallet to share the SIN here.  
+          Assume this is UOGuelph.com. UOGuelph wants SIN number of one of the user. UOGuelph can send a Request the user's wallet to share the SIN here.  
         </p>
 
         {/* Form */}
@@ -99,10 +116,14 @@ const App = () => {
           <button type="submit">Submit</button>
         </form>
       </div>
-
-      <div className={styles.box}>
-        <h3>{formData.data}</h3>
-      </div>
+      {
+        retrivedData && (
+          <div className={styles.box}>
+            <h2>Your requested Data</h2>
+            <h3>{retrivedData}</h3>
+          </div>
+        )
+      }
     </main>
   );
 };

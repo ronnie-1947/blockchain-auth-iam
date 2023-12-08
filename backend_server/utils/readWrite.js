@@ -21,10 +21,10 @@ export const writeData = (data, address) => {
   fs.writeFileSync(dataPath, JSON.stringify(arr))
 }
 
-export const readData = (dataName, address='')=>{
+export const readData = (dataName, address = '') => {
   const dataFileExists = fs.existsSync(dataPath)
 
-  if(!dataFileExists) return {}
+  if (!dataFileExists) return {}
 
   const dataFileStr = fs.readFileSync(dataPath, 'utf-8')
   const dataFile = JSON.parse(dataFileStr)
@@ -32,37 +32,19 @@ export const readData = (dataName, address='')=>{
 }
 
 export const readKeys = (address) => {
-  
-  let keys ={}
+
+  let keys = {}
   const jsonKeysExist = fs.existsSync(keysPath)
   if (jsonKeysExist) {
     const jsonStr = fs.readFileSync(keysPath, 'utf-8')
-    if(jsonStr.length>0) keys = JSON.parse(jsonStr)
+    if (jsonStr.length > 0) keys = JSON.parse(jsonStr)
   }
-  return keys[address.replace('0x','')]
+  return keys[address.replace('0x', '')]
 }
 
-/* 
-{
-  0x2de3d: {
-    walmart: {
-      SIN: {
-        active: true,
-        expiry: Date(),
-        purpose: Employment records
-        timestamp: new Date()
-        logs: [
-          permisson granted to view SIN in timestamp,
-          permisson revoked to view SIN in timestamp
-        ]
-      }
-    }
-  }
-}
 
-*/
-export const readConsents = (address, domain, data)=>{
-  let cmgmt ={}
+export const readConsents = (address, domain, data) => {
+  let cmgmt = {}
   const cmgmtExist = fs.existsSync(cPath)
   if (cmgmtExist) {
     const cmgmtStr = fs.readFileSync(cPath, 'utf-8')
@@ -70,15 +52,63 @@ export const readConsents = (address, domain, data)=>{
   }
   return cmgmt?.[address]?.[domain]?.[data]
 }
+export const readAllConsents = (address) => {
+  let cmgmt = {}
+  const cmgmtExist = fs.existsSync(cPath)
+  if (cmgmtExist) {
+    const cmgmtStr = fs.readFileSync(cPath, 'utf-8')
+    cmgmt = JSON.parse(cmgmtStr)
+  }
+  return cmgmt?.[address]
+}
+
+
+
+export const writeInitialConsent = (address) => {
+  const cmgmtExist = fs.existsSync(cPath)
+  let cmgmt = {
+    [address]: {}
+  }
+  if (cmgmtExist) {
+    const cmgmtstr = fs.readFileSync(cPath, 'utf8')
+    cmgmt = JSON.parse(cmgmtstr)
+    cmgmt[address] = {}
+  }
+  fs.writeFileSync(cPath, JSON.stringify(cmgmt))
+}
+
 
 /*
 {
   domain: 'walmart'
   purpose: 'Employment records',
   data: SIN
-  expiry: 23423234
+  expiry: 23423234,
+  active: true
 */
+export const writeConsent = (address, consent) => {
+  const cmgmtstr = fs.readFileSync(cPath, 'utf8')
+  let cmgmt = JSON.parse(cmgmtstr)
 
-export const writeConsent = (address, consent)=>{
-  let cmgmt = {}
+  const { domain, purpose, data, active, expiry } = consent
+  const newConsent = { active, expiry, purpose }
+
+  let domainConsent = cmgmt?.[address]?.[domain]
+  if (domainConsent) {
+    // If the domain is already available
+    if (cmgmt?.[address]?.[domain]?.[data]) {
+      const logs = [...cmgmt?.[address][domain][data]?.logs, active ? `permisson granted to view ${data} on ${Date.now()}` : `permisson revoked to view ${data} on ${Date.now()}`]
+      cmgmt[address][domain][data] = { ...(cmgmt?.[address]?.[domain]?.[data]), ...newConsent, logs }
+
+    } else {
+      cmgmt[address][domain][data] = { ...newConsent, timestamp: new Date().toISOString(), logs: [active ? `permisson granted to view ${data} on ${Date.now()}` : `permisson revoked to view ${data} on ${Date.now()}`] }
+    }
+
+  } else {
+    // When a new cosent is made for a domain
+    cmgmt[address][domain] = {}
+    cmgmt[address][domain][data] = { ...newConsent, timestamp: new Date().toISOString(), logs: [active ? `permisson granted to view ${data} on ${Date.now()}` : `permisson revoked to view ${data} on ${Date.now()}`] }
+  }
+
+  fs.writeFileSync(cPath, JSON.stringify(cmgmt))
 }

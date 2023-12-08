@@ -1,5 +1,5 @@
 import express from 'express'
-import { writeData } from '../utils/readWrite.js'
+import { readAllConsents, writeData } from '../utils/readWrite.js'
 
 export const welcome = async (_, res=express.response, next)=>{
   try {
@@ -44,6 +44,16 @@ export const deleteData = async (_, res=express.response, next)=>{
 export const reqData = async (_, res=express.response, next)=>{
   try {
     
+  } catch (error) {
+    next(error)
+  }
+}
+
+export const getConsents = async (req, res=express.response, next)=>{
+  try {
+    const {address} = req.body
+    const data = readAllConsents(address)
+    res.json(data)
   } catch (error) {
     next(error)
   }

@@ -3,7 +3,7 @@
 export async function encryptData(data, key) {
   const encoder = new TextEncoder();
   const encodedData = encoder.encode(data);
-
+  key = key.replace('0x', '')
   const iv = crypto.getRandomValues(new Uint8Array(12));
 
   // Convert the hex string to an array of bytes
@@ -12,6 +12,7 @@ export async function encryptData(data, key) {
 
   // Create an ArrayBuffer from the array of bytes
   const keyBuffer = new Uint8Array(bytes).buffer;
+  console.log(keyBuffer)
 
   // Import the key
   const importedKey = await crypto.subtle.importKey('raw', keyBuffer, 'AES-GCM', true, ['encrypt']);
@@ -28,31 +29,34 @@ export async function encryptData(data, key) {
   return hexPairs.join('');
 }
 
-export async function decryptData(encryptedHexData, key) {
-  // Extract IV from the encrypted data
-  const iv = encryptedData.slice(0, 12);
 
-  const bytePairs = key.match(/.{1,2}/g) || [];
+export async function decryptData(encryptedData, key) {
+  // Convert the hex string to an array of bytes
+  const bytePairs = encryptedData.match(/.{1,2}/g) || [];
   const bytes = bytePairs.map((byte) => parseInt(byte, 16));
-  const byteData = encryptedHexData.match(/.{1,2}/g) || [];
-  const bytesData = byteData.map((byte) => parseInt(byte, 16));
 
   // Create an ArrayBuffer from the array of bytes
-  const keyBuffer = new Uint8Array(bytes).buffer;
+  const encryptedBuffer = new Uint8Array(bytes).buffer;
 
-  // Extract encrypted data
-  const encryptedBytes = bytesData.slice(12);
+  // Extract IV from the encrypted data
+  const iv = encryptedBuffer.slice(0, 12);
 
   // Import the key
+  key = key.replace('0x', '');
+  const keyBytePairs = key.match(/.{1,2}/g) || [];
+  const keyBytes = keyBytePairs.map((byte) => parseInt(byte, 16));
+  const keyBuffer = new Uint8Array(keyBytes).buffer;
+
   const importedKey = await crypto.subtle.importKey('raw', keyBuffer, 'AES-GCM', true, ['decrypt']);
 
   // Decrypt the data
-  const decryptedData = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, importedKey, encryptedBytes);
+  const decryptedData = await crypto.subtle.decrypt({ name: 'AES-GCM', iv }, importedKey, encryptedBuffer.slice(12));
 
-  // Convert the decrypted data to a string
+  // Decode the decrypted data
   const decoder = new TextDecoder();
   return decoder.decode(decryptedData);
 }
+
 
 export async function decryptWithPrivateKey(encryptedHex, privateKey) {
   const privKey = pemToBinary(privateKey);
@@ -67,7 +71,7 @@ export async function decryptWithPrivateKey(encryptedHex, privateKey) {
 
   // Convert the hex string to a Uint8Array
   const encryptedArray = new Uint8Array(encryptedHex.match(/.{1,2}/g).map(byte => parseInt(byte, 16)));
-  
+
   // Decrypt the encrypted data
   const decryptedData = await crypto.subtle.decrypt(
     { name: 'RSA-OAEP' },

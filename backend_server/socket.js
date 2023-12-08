@@ -1,6 +1,6 @@
 import { accInfoSoc } from "./services/eth.service.js";
 import WebSocket from 'ws'
-import { readConsents, readData } from "./utils/readWrite.js";
+import { readConsents, readData, writeConsent } from "./utils/readWrite.js";
 
 const clients = new Map();
 
@@ -58,23 +58,51 @@ export default function (ws, req) {
 
         case 'reqData':
           console.log(payload)
-          const {domain, data, purpose, address: addr} = payload
+          const { domain, data: dataName, purpose, address: addr } = payload
 
           // check existing data
-          const encryptedData = readData(data, addr)
-          if(!encryptedData) sendCustomMessageToClient(clients.get(thirdPartyId), JSON.stringify({
-            status: 'dataReqFailed',
-            payload: 'Data not stored in chain'
-          }))
-
+          const encryptedData = readData(dataName, addr)
+          if (!encryptedData) {
+            sendCustomMessageToClient(clients.get(thirdPartyId), JSON.stringify({
+              status: 'dataReqFailed',
+              payload: 'Data not stored in chain'
+            }))
+            return
+          }
           // check permisson
-          const consent = readConsents(addr,domain, data)
+          const consent = readConsents(addr, domain, dataName)
 
           // Send the payload to user client
           sendCustomMessageToClient(clients.get(userClientId), JSON.stringify({
-            consent, encryptedData, purpose
+            status: 'reqDataDecrypt',
+            payload: {
+              consent, encryptedData, purpose, dataName, domain
+            }
           }))
           break
+
+        case 'sentDecryptedData':
+          const { data: d, newConsent, address: walletAddr, purpose: dataPurpose, domain: dataDomain } = payload
+
+          const dateAfterAYear = new Date(new Date().setFullYear(new Date().getFullYear() + 1));
+          const dataKey = (Object.keys(d))[0]
+
+          // Write consent
+          if(newConsent){
+            writeConsent(walletAddr, {
+              domain: dataDomain,
+              purpose: dataPurpose,
+              active: true,
+              data: dataKey,
+              expiry: dateAfterAYear
+            })
+          }
+
+        // Send to Thirdparty
+        sendCustomMessageToClient(clients.get(thirdPartyId), JSON.stringify({
+          status: 'dataRetrived',
+          payload: d
+        }))
 
         default:
         // Do Nothing
@@ -104,4 +132,3 @@ const sendCustomMessageToClient = (client, message) => {
     client.send(message);
   }
 }
-

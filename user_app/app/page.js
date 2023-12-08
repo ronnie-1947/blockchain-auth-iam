@@ -1,6 +1,5 @@
 'use client'
 
-import { useRouter } from 'next/navigation'
 import React, { useEffect, useState } from 'react'
 import styles from './Page.module.scss';
 import { encryptData } from '@/utils/encrypt';
@@ -11,7 +10,6 @@ const page = () => {
 
   const {state} = useContext()
   const userData = state.user
-  console.log(userData)
 
   const [formData, setFormData] = useState({
     key: '',
@@ -31,7 +29,7 @@ const page = () => {
     if (key.length < 1 || value.length < 1) return
 
     // Encrypt with private key
-    const encrypted = await encryptData(value, userData?.walletKey.replace('0x', ''))
+    const encrypted = await encryptData(value, userData?.walletKey)
 
     // Submit data
     const store = await fetch('http://localhost:3735/private/storeData', {
@@ -45,15 +43,17 @@ const page = () => {
       })
     })
 
-    const jsonResponse = await store.json()
-
-    console.log(jsonResponse)
+    await store.json()
+    setFormData({
+      key: '',
+      value: ''
+    })
   };
 
   return (
     <div className={styles.pageContainer}>
       <div className={styles.topSection}>
-        <h1>Welcome to Next.js App</h1>
+        <h1>Welcome to User Wallet App</h1>
         <p>
           <strong>Name:</strong> {userData?.name} | <strong>Email:</strong> {userData?.email} |{' '}
           <strong>Address:</strong> {userData?.address}

@@ -1,0 +1,54 @@
+
+.popup-content {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  background-color: rgba(0, 0, 0, 0.181);
+  width: 100%;
+  height: 100%;
+  border-radius: 10px;
+
+  .popup-box{
+    flex: 1;
+    h2 {
+      color: #38B2AC; // Primary color
+      margin-bottom: 10px;
+      text-align: center;
+    }
+    
+    h3{
+      text-align: center;
+    }
+    
+    p {
+      color: #4c6082; // Secondary color
+      text-align: center;
+      margin-bottom: 20px;
+    }
+
+    .header-box{
+      margin-bottom: 4rem;
+    }
+  }
+
+
+  .button-container {
+    display: flex;
+    justify-content: space-between;
+    width: 100%;
+    padding: 1rem;
+
+    button {
+      padding: 10px;
+      background-color: #38B2AC; // Primary color
+      color: white;
+      border: none;
+      border-radius: 4px;
+      cursor: pointer;
+
+      &:hover {
+        background-color: #2C7A7B; // Darker shade of primary color
+      }
+    }
+  }
+}

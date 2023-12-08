@@ -2,7 +2,7 @@ import express from 'express'
 import cookie from 'cookie'
 import { addUser, getUser } from '../utils/contractCalls.utils.js'
 import {makeKeyPair} from '../utils/crypto.utils.js'
-import { readKeys } from '../utils/readWrite.js'
+import { readKeys, writeInitialConsent } from '../utils/readWrite.js'
 
 
 export const welcome = async (_, res = express.response, next) => {
@@ -25,6 +25,7 @@ export const signup = async (req= express.request, res = express.response, next)
     
     // Save user in blockchain
     const receipt = await addUser(address, name, email, publicKey)
+    writeInitialConsent(address)
     console.log(receipt.events.UserAdded.returnValues)
 
     // return user in json format
