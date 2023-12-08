@@ -3,7 +3,7 @@
 import { decryptWithPrivateKey, decryptData } from '@/utils/encrypt';
 import { useEffect } from 'react'
 
-const useSocket = (consentPopup, setConsentPopup) => {
+const useSocket = (consentPopup, setConsentPopup, setLoginPopup) => {
 
   useEffect(() => {
 
@@ -22,7 +22,7 @@ const useSocket = (consentPopup, setConsentPopup) => {
       // socket.send(JSON.stringify({ status: 'decrypt_auth', whoami: 'client_react' }))
       socket.onmessage = async (event) => {
         const receivedMessage = JSON.parse(event.data);
-        console.log('Received Message',receivedMessage)
+        console.log('Received Message', receivedMessage)
 
         const { status = '', payload = {} } = receivedMessage
 
@@ -30,23 +30,17 @@ const useSocket = (consentPopup, setConsentPopup) => {
           case 'decryptCode':
 
             const { encryptedCode } = payload
-            // Decrypt the code with private key
-
-            const decryptedMessage = await decryptWithPrivateKey(encryptedCode, token?.privateKey)
-            console.log(decryptedMessage)
-            // Return the message to server
-            socket.send(JSON.stringify({ status: 'sentDecryptCode', payload: decryptedMessage }))
+            setLoginPopup({encryptedCode})
             break
 
           case 'reqDataDecrypt':
-            const {consent, encryptedData, purpose, dataName, domain} = payload
+            const { consent, encryptedData, purpose, dataName, domain } = payload
 
-            if(consent){
+            if (!consent) {
               // Show popup
-              setConsentPopup(payload)
+              setConsentPopup({...payload, noConsent: true})
               break
             }
-
             const decryptedData = await decryptData(encryptedData, token.walletKey)
             // Send it to backend
             socket.send(JSON.stringify({
@@ -59,7 +53,7 @@ const useSocket = (consentPopup, setConsentPopup) => {
                 purpose, domain, newConsent: true
               }
             }))
-          }
+        }
       };
 
       return () => {

@@ -70,7 +70,9 @@ export default function (ws, req) {
             return
           }
           // check permisson
-          const consent = readConsents(addr, domain, dataName)
+          let consent = readConsents(addr, domain, dataName)
+          if(new Date(consent?.expiry) < new Date() || !consent?.active) consent = null
+          console.log(consent, 'consent is dangerous')
 
           // Send the payload to user client
           sendCustomMessageToClient(clients.get(userClientId), JSON.stringify({

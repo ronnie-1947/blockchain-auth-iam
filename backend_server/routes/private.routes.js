@@ -9,5 +9,6 @@ router.post('/updateData', privateServices.updateData)
 router.post('/deleteData', privateServices.deleteData)
 router.post('/reqData', privateServices.reqData) // Used by 3rd party to request any data
 router.post('/getConsents', privateServices.getConsents)
+router.post('/updateConsent', privateServices.updateConsent)
 
 export default router

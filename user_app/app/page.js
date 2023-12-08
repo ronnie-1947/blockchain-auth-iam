@@ -4,11 +4,12 @@ import React, { useEffect, useState } from 'react'
 import styles from './Page.module.scss';
 import { encryptData } from '@/utils/encrypt';
 import { useContext } from '@/hooks/useAuthContext';
+import Link from 'next/link';
 
 
 const page = () => {
 
-  const {state} = useContext()
+  const { state } = useContext()
   const userData = state.user
 
   const [formData, setFormData] = useState({
@@ -58,6 +59,11 @@ const page = () => {
           <strong>Name:</strong> {userData?.name} | <strong>Email:</strong> {userData?.email} |{' '}
           <strong>Address:</strong> {userData?.address}
         </p>
+        <Link href='/consent'>
+          <button>
+            See consents
+          </button>
+        </Link>
       </div>
 
       <div className={styles.bottomSection}>
