@@ -12,7 +12,7 @@ export default function (ws, req) {
 
   // Handle messages from WebSocket clients
   ws.on('message', async (message) => {
-    // console.log(message)
+    console.log(message)
     try {
       message = JSON.parse(message)
       const { status = '', payload = {} } = message
