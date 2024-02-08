@@ -101,7 +101,14 @@ const Auth = ({ children }) => {
   return (
     <>
       {
-        loginPopup?.encryptedCode || consentPopup?.noConsent && (
+        loginPopup?.encryptedCode && (
+          <PopupLayout>
+            <Popup {...popupData} />
+          </PopupLayout>
+        )
+      }
+      {
+        consentPopup?.noConsent && (
           <PopupLayout>
             <Popup {...popupData} />
           </PopupLayout>

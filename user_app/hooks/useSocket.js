@@ -62,7 +62,7 @@ const useSocket = (consentPopup, setConsentPopup, setLoginPopup) => {
     } catch (error) {
       console.error(error)
       "Closing conn"
-      socket.close()
+      // socket?.close()
     }
 
   }, [consentPopup]);
