@@ -1,4 +1,4 @@
-import { accInfoSoc } from "./services/eth.service.js";
+  import { accInfoSoc } from "./services/eth.service.js";
 import WebSocket from 'ws'
 import { readConsents, readData, writeConsent } from "./utils/readWrite.js";
 
