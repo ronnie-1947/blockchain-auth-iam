@@ -8,7 +8,7 @@ const tConfig = truffleConfig(GANACHE_HOST, GANACHE_PORT, GANACHE_NETWORKID)
 
 const web3_pool = function () {
   const nw = tConfig.networks[MODE || 'development'];
-  if (nw.provider) {
+  if (nw?.provider) {
     return new Web3(nw.provider());
   } else {
     //fallback on host/port if provider not defined

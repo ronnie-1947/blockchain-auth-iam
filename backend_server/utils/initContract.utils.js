@@ -2,7 +2,7 @@ import dotenv from 'dotenv'
 import fs from 'fs'
 import path from 'path'
 import { web3 } from '../server.js'
-dotenv.config
+dotenv.config()
 
 const contractPath = path.join(process.cwd(), 'build', 'contracts', 'User.json')
 const UserContractJSON = fs.readFileSync(contractPath, 'utf-8')
@@ -25,7 +25,6 @@ export default function (eth) {
     })
     const bytesText = web3.utils.hexToUtf8(result)
     const str = bytesText.replace(/[\x00-\x1F\x7F]+/g, '').replace(/\s/g, '')
-    console.log(bytesText)
     return str;
   }
 }

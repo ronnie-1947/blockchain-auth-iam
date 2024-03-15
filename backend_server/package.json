@@ -8,7 +8,7 @@
     "start": "nodemon server.js --ignore database",
     "compile": "truffle compile --config truffle-config.cjs",
     "deploy": "truffle migrate --config truffle-config.cjs",
-    "ganache": "ganache --host 192.168.56.1 --networkId 5777 --port 7545 -m \"enforce dynamic phone crater virtual orphan top write bacon toast kick humor\" --account_keys_path ./database/walletKeys.json --quiet"
+    "ganache": "ganache --host 127.0.0.1 --networkId 5777 --port 6545 -m \"rack wall elevator farm artwork west echo attend capable mystery sunny raise\" --account_keys_path ./database/walletKeys.json --quiet"
   },
   "keywords": [],
   "author": "",
@@ -21,6 +21,7 @@
     "dotenv": "^16.3.1",
     "express": "^4.18.2",
     "express-ws": "^5.0.2",
+    "ganache": "^7.9.2",
     "web3": "^4.2.2",
     "ws": "^8.14.2"
   },
